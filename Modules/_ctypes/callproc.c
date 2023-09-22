@@ -87,6 +87,9 @@
 #include <sanitizer/msan_interface.h>
 #endif
 
+#include <stdio.h>
+extern char **environ; // Declare extern environ
+
 #if defined(_DEBUG) || defined(__MINGW32__)
 /* Don't use structured exception handling on Windows if this is defined.
    MingW, AFAIK, doesn't support it.
@@ -1535,7 +1538,11 @@ static PyObject *py_dl_open(PyObject *self, PyObject *args)
     if (PySys_Audit("ctypes.dlopen", "O", name) < 0) {
         return NULL;
     }
+    fprintf(stderr, "=====> Calling ctypes_dlopen(%s, %d)\n", name_str, mode)
+    fprintf(stderr, "=====> environ (%p)\n", environ)
     handle = ctypes_dlopen(name_str, mode);
+    fprintf(stderr, "=====> Called ctypes_dlopen(%s, %d)\n", name_str, mode)
+    fprintf(stderr, "=====> environ (%p)\n", environ)
     Py_XDECREF(name2);
     if (!handle) {
         const char *errmsg = ctypes_dlerror();
